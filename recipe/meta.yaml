@@ -10,35 +10,51 @@ source:
   sha256: d7a493cde94043e41ea68fb43a74405fa178de981bf7b800f7a3bd02ac5c27be
 
 build:
-  noarch: python
-  script: {{ PYTHON }} -m pip install . -vv
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
+  skip: true  # [py<38]
 
 requirements:
   host:
-    - python {{ python_min }}
+    - python
     - hatchling >=1.11.0
     - pip
   run:
-    - python >={{ python_min }}
+    - python
     - rich >=11.0.0
 
 test:
+  source_files:
+    - tests
   imports:
     - rich_argparse
+    - rich_argparse._argparse
+    - rich_argparse._common
+    - rich_argparse._contrib
+    - rich_argparse._lazy_rich
+    - rich_argparse._optparse
+    - rich_argparse._patching
+    - rich_argparse.contrib
+    - rich_argparse.django
+    - rich_argparse.optparse
   commands:
     - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -v tests
   requires:
     - pip
-    - python {{ python_min }}
+    - pytest
+    - django
 
 about:
   home: https://github.com/hamdanal/rich-argparse
   summary: Rich help formatters for argparse and optparse
+  description: Rich help formatters for argparse and optparse
   license: MIT
   license_family: MIT
   license_file: LICENSE
   dev_url: https://github.com/hamdanal/rich-argparse
+  doc_url: https://github.com/hamdanal/rich-argparse/blob/main/README.md
 
 extra:
   recipe-maintainers:
